@@ -1,0 +1,176 @@
+{% extends 'layout/_layout.html' %}
+
+{% block css %}
+
+
+{% endblock %}
+
+{% block conent %}
+    <ol class="breadcrumb" style="margin-bottom: 0;">
+        <li><a href="/cmdb.html">首页</a></li>
+        <li><a href="/asset.html">资产列表</a></li>
+        <li class="active">添加资产</li>
+    </ol>
+    <div style="padding: 5px 8px;">
+
+
+    </div>
+    <style>
+        .dotted {
+            border-top: 1px dotted #ddd;
+        }
+
+        .text-left {
+            text-align: left !important;
+        }
+    </style>
+    <form class="form-horizontal" id="add_form">
+
+
+        {#        <div class="form-horizontal clearfix" style="margin-top:20px;">#}
+
+        <div class="form-group col-md-6">
+            <div class="col-md-4 control-label">主机名：</div>
+            <div class="col-md-6 control-label text-left"><input name="hostname" class="form-control" type="text"></div>
+        </div>
+
+        <div class="form-group col-md-6">
+            <div class="col-md-4 control-label">管理IP：</div>
+            <div class="col-md-6 control-label text-left"><input name="manage_ip" class="form-control" type="text">
+            </div>
+        </div>
+
+        {#            <div class="form-group col-md-6">#}
+        {#                <div class="col-md-4 control-label">序列号：</div>#}
+        {#                <div class="col-md-6 control-label text-left"><input class="form-control" type="text"></div>#}
+        {#            </div>#}
+
+        <div class="form-group col-md-6">
+            <div class="col-md-4 control-label">资产类型：</div>
+            <div class="col-md-6 control-label text-left">
+                <select name="device_type_id" class="form-control">
+                    {% for op in device_type_list %}
+                        <option value="{{ op.id }}">{{ op.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-md-6">
+            <div class="col-md-4 control-label">资产状态：</div>
+            <div class="col-md-6 control-label text-left">
+                <select name="device_status_id" class="form-control">
+                    {% for op in device_status_list %}
+                        <option value="{{ op.id }}">{{ op.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-md-6">
+            <div class="col-md-4 control-label">IDC：</div>
+            <div class="col-md-6 control-label text-left">
+                <select name="idc_id" class="form-control">
+                    {% for op in idc_list %}
+                        <option value="{{ op.id }}">{{ op.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-md-6">
+            <div class="col-md-4 control-label">业务线：</div>
+            <div class="col-md-6 control-label text-left">
+                <select name="business_unit_id" class="form-control">
+                    {% for op in business_unit_list %}
+                        <option value="{{ op.id }}">{{ op.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+
+        {#            <div class="form-group col-md-6">#}
+        {#                <div class="col-md-4 control-label">更新时间</div>#}
+        {#                <div class="col-md-6 control-label text-left">{{ response.data.asset.latest_date|date:"Y-m-d" }}</div>#}
+        {#            </div>#}
+
+        {#            <div class="dotted  col-md-12"></div>#}
+
+
+        <div class="form-group col-md-6">
+            <div class="col-md-4 control-label">机柜号：</div>
+            <div class="col-md-6 control-label text-left"><input name="cabinet_num" class="form-control" type="text">
+            </div>
+        </div>
+
+        <div class="form-group col-md-6">
+            <div class="col-md-4 control-label">柜上位置：</div>
+            <div class="col-md-6 control-label text-left"><input name="cabinet_order" class="form-control" type="text">
+            </div>
+        </div>
+        <span class="error_msg"></span>
+        <div class="dotted  col-md-12"></div>
+        <div class="form-group col-md-6">
+            <div class="col-md-6 control-label">
+                <input id="ajax_submit" type="button" value="提交" class="btn btn-primary"/>
+            </div>
+        </div>
+        {#                    <div class="col-md-12">#}
+        {#                        <div class="form-group col-md-6">#}
+        {#                            <div class="col-md-4 control-label">业务联系人：</div>#}
+        {#                            <div class="col-md-8 control-label text-left">#}
+        {#                                {% for obj in response.data.asset.business_unit.contact.users.all %}#}
+        {#                                    <div>#}
+        {#                                        <p>{{ obj.name }}</p>#}
+        {#                                        <div style="margin-left: 20px;">#}
+        {#                                            <p>邮箱：{{ obj.email }}</p>#}
+        {#                                            <p>手机：{{ obj.mobile }}</p>#}
+        {#                                            <p>座机：{{ obj.phone }}</p>#}
+        {#                                        </div>#}
+        {#                                    </div>#}
+        {#                                {% endfor %}#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                    </div>#}
+
+
+        {#        </div>#}
+
+    </form>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/static/plugins/bootstrap/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/js/nb-list.js"></script>
+
+    <script>
+        $(function () {
+            $.initMenu('#menu_asset');
+            $('#ajax_submit').click(function () {
+                $.ajax({
+                    url: '/add-asset.html',
+                    type: 'POST',
+                    data: $('#add_form').serialize(),
+                    success: function (response) {
+                        console.log(1);
+                        //var obj = JSON.parse(res1);
+                        {#                        console.log(obj.status, obj.error);#}
+                        if (response.status) {
+                            alert(response.message);
+                            location.href = 'http://127.0.0.1:8812/asset.html'
+                        } else {
+                            {#                            $('#error_msg').text(obj.error).removeClass('hide')#}
+                            $('.error_msg').text(response.error);
+                        }
+                    },
+                    error: function () {
+                        alert('请求异常');
+                    }
+                })
+            });
+        });
+
+
+    </script>
+{% endblock %}
